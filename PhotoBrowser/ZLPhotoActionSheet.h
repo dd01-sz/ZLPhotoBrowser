@@ -36,6 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^selectImageBlock)(NSArray<UIImage *> *__nullable images, NSArray<PHAsset *> *assets, BOOL isOriginal);
 
 /**
+ 选择照片回调，回调解析好的图片、对应的asset对象、是否原图
+ pod 2.2.6版本之后 统一通过selectImageBlock回调
+ */
+
+/**
  取消选择回调
  */
 @property (nonatomic, copy) void (^cancleBlock)(void);
@@ -74,6 +79,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)showPhotoLibraryWithSender:(UIViewController *)sender;
 
+/**
+ 直接进入相机选择界面
+ */
+- (void)showCustomCamera;
 
 /**
  提供 预览用户已选择的照片，并可以取消已选择的照片 （需先设置 sender 参数）

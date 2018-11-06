@@ -178,6 +178,11 @@ double const ScalePhotoWidth = 1000;
     [self showPreview:NO animate:NO];
 }
 
+- (void)showCustomCamera
+{
+    [self btnCamera_Click:nil];
+}
+
 - (void)showPreview:(BOOL)preview animate:(BOOL)animate
 {
     NSAssert(self.sender != nil, @"sender 对象不能为空");
