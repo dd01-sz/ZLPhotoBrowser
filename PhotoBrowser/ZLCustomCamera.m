@@ -69,6 +69,7 @@
 @property (nonatomic, assign) NSInteger maxRecordDuration;
 
 @property (nonatomic, strong) UIButton *dismissBtn;
+@property (nonatomic, strong) UIButton *photoBtn;
 @property (nonatomic, strong) UIButton *cancelBtn;
 @property (nonatomic, strong) UIButton *doneBtn;
 @property (nonatomic, strong) UIView *topView;
@@ -132,6 +133,8 @@
     self.topView.layer.cornerRadius = height*kTopViewScale/2;
     
     self.dismissBtn.frame = CGRectMake(60, self.bounds.size.height/2-25/2, 25, 25);
+    
+    self.photoBtn.frame = CGRectMake(self.bounds.size.width - 85, self.bounds.size.height/2-25/2, 25, 25);
 
     self.cancelBtn.frame = self.bottomView.frame;
     self.cancelBtn.layer.cornerRadius = height*kBottomViewScale/2;
@@ -178,6 +181,12 @@
     [self.dismissBtn setImage:GetImageWithName(@"zl_arrow_down") forState:UIControlStateNormal];
     [self.dismissBtn addTarget:self action:@selector(dismissVC) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.dismissBtn];
+    
+    self.photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.photoBtn.frame = CGRectMake(60, self.bounds.size.height/2-25/2, 25, 25);
+//    [self.photoBtn setImage:GetImageWithName(@"zl_arrow_down") forState:UIControlStateNormal];
+    self.photoBtn.backgroundColor = [UIColor redColor];
+    [self addSubview:self.photoBtn];
     
     self.cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.cancelBtn.backgroundColor = [kRGB(244, 244, 244) colorWithAlphaComponent:.9];
@@ -241,6 +250,7 @@
 - (void)startAnimate
 {
     self.dismissBtn.hidden = YES;
+    self.photoBtn.hidden = YES;
     
     [UIView animateWithDuration:kAnimateDuration animations:^{
         self.bottomView.layer.transform = CATransform3DScale(CATransform3DIdentity, 1/kBottomViewScale, 1/kBottomViewScale, 1);
@@ -267,6 +277,7 @@
     self.bottomView.hidden = YES;
     self.topView.hidden = YES;
     self.dismissBtn.hidden = YES;
+    self.photoBtn.hidden = YES;
     
     self.bottomView.layer.transform = CATransform3DIdentity;
     self.topView.layer.transform = CATransform3DIdentity;
@@ -307,6 +318,7 @@
         [self.animateLayer removeFromSuperlayer];
     }
     self.dismissBtn.hidden = NO;
+    self.photoBtn.hidden = NO;
     self.bottomView.hidden = NO;
     self.topView.hidden = NO;
     self.cancelBtn.hidden = YES;
