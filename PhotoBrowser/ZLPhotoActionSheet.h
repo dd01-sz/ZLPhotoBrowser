@@ -36,9 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^selectImageBlock)(NSArray<UIImage *> *__nullable images, NSArray<PHAsset *> *assets, BOOL isOriginal);
 
 /**
- 选择照片回调，回调解析好的图片、对应的asset对象、是否原图
- pod 2.2.6版本之后 统一通过selectImageBlock回调
+ 如果拍照则videoUrl为nil，如果视频则image为nil
  */
+@property (nonatomic, copy) void (^doneBlock)(UIImage *image, NSURL *videoUrl);
 
 /**
  取消选择回调

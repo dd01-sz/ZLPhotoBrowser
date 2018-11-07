@@ -180,6 +180,7 @@ double const ScalePhotoWidth = 1000;
 
 - (void)showCustomCamera
 {
+    [self.sender.view addSubview:self];
     [self btnCamera_Click:nil];
 }
 
@@ -524,6 +525,9 @@ double const ScalePhotoWidth = 1000;
         camera.doneBlock = ^(UIImage *image, NSURL *videoUrl) {
             zl_strongify(weakSelf);
             [strongSelf saveImage:image videoUrl:videoUrl];
+            if (strongSelf.doneBlock) {
+                strongSelf.doneBlock(image, videoUrl);
+            }
         };
         [self.sender showDetailViewController:camera sender:nil];
     }

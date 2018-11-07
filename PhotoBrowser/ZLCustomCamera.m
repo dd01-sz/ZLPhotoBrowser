@@ -41,10 +41,7 @@
  */
 - (void)onOkClick;
 
-/**
- 打开相册
- */
-- (void)onOpenGallery;
+- (void)onDismiss;
 
 @end
 
@@ -56,7 +53,7 @@
         unsigned int finishRecord : 1;
         unsigned int retake : 1;
         unsigned int okClick : 1;
-        unsigned int openGallery : 1;
+        unsigned int dismiss : 1;
     } _delegateFlag;
     
     //避免动画及长按手势触发两次
@@ -71,7 +68,7 @@
 @property (nonatomic, strong) UIColor *circleProgressColor;
 @property (nonatomic, assign) NSInteger maxRecordDuration;
 
-@property (nonatomic, strong) UIButton *photoBtn;
+@property (nonatomic, strong) UIButton *dismissBtn;
 @property (nonatomic, strong) UIButton *cancelBtn;
 @property (nonatomic, strong) UIButton *doneBtn;
 @property (nonatomic, strong) UIView *topView;
@@ -116,7 +113,7 @@
     _delegateFlag.finishRecord = [delegate respondsToSelector:@selector(onFinishRecord)];
     _delegateFlag.retake = [delegate respondsToSelector:@selector(onRetake)];
     _delegateFlag.okClick = [delegate respondsToSelector:@selector(onOkClick)];
-    _delegateFlag.openGallery = [delegate respondsToSelector:@selector(onOpenGallery)];
+    _delegateFlag.dismiss = [delegate respondsToSelector:@selector(onDismiss)];
 }
 
 - (void)layoutSubviews
@@ -129,13 +126,13 @@
     self.bottomView.frame = CGRectMake(0, 0, height*kBottomViewScale, height*kBottomViewScale);
     self.bottomView.center = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds));
     self.bottomView.layer.cornerRadius = height*kBottomViewScale/2;
-
+    
     self.topView.frame = CGRectMake(0, 0, height*kTopViewScale, height*kTopViewScale);
     self.topView.center = self.bottomView.center;
     self.topView.layer.cornerRadius = height*kTopViewScale/2;
     
-    self.photoBtn.frame = CGRectMake(60, self.bounds.size.height/2-36/2, 36, 36);
-
+    self.dismissBtn.frame = CGRectMake(60, self.bounds.size.height/2-25/2, 25, 25);
+    
     self.cancelBtn.frame = self.bottomView.frame;
     self.cancelBtn.layer.cornerRadius = height*kBottomViewScale/2;
     
@@ -176,12 +173,11 @@
     self.topView.userInteractionEnabled = NO;
     [self addSubview:self.topView];
     
-    self.photoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.photoBtn.frame = CGRectMake(60, self.bounds.size.height/2-36/2, 36, 36);
-    [self.photoBtn setImage:GetImageWithName(@"zl_btn_gallery") forState:UIControlStateNormal];
-    [self.photoBtn addTarget:self action:@selector(openGallery) forControlEvents:UIControlEventTouchDragInside];
-    [self.photoBtn.imageView setContentMode:UIViewContentModeCenter];
-    [self addSubview:self.photoBtn];
+    self.dismissBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.dismissBtn.frame = CGRectMake(60, self.bounds.size.height/2-25/2, 25, 25);
+    [self.dismissBtn setImage:GetImageWithName(@"zl_arrow_down") forState:UIControlStateNormal];
+    [self.dismissBtn addTarget:self action:@selector(dismissVC) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:self.dismissBtn];
     
     self.cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.cancelBtn.backgroundColor = [kRGB(244, 244, 244) colorWithAlphaComponent:.9];
@@ -244,7 +240,7 @@
 #pragma mark - 动画
 - (void)startAnimate
 {
-    self.photoBtn.hidden = YES;
+    self.dismissBtn.hidden = YES;
     
     [UIView animateWithDuration:kAnimateDuration animations:^{
         self.bottomView.layer.transform = CATransform3DScale(CATransform3DIdentity, 1/kBottomViewScale, 1/kBottomViewScale, 1);
@@ -256,7 +252,7 @@
         animation.duration = self.maxRecordDuration;
         animation.delegate = self;
         [self.animateLayer addAnimation:animation forKey:nil];
-
+        
         [self.bottomView.layer addSublayer:self.animateLayer];
     }];
 }
@@ -270,7 +266,7 @@
     
     self.bottomView.hidden = YES;
     self.topView.hidden = YES;
-    self.photoBtn.hidden = YES;
+    self.dismissBtn.hidden = YES;
     
     self.bottomView.layer.transform = CATransform3DIdentity;
     self.topView.layer.transform = CATransform3DIdentity;
@@ -310,7 +306,7 @@
         [self.animateLayer removeAllAnimations];
         [self.animateLayer removeFromSuperlayer];
     }
-    self.photoBtn.hidden = NO;
+    self.dismissBtn.hidden = NO;
     self.bottomView.hidden = NO;
     self.topView.hidden = NO;
     self.cancelBtn.hidden = YES;
@@ -321,6 +317,10 @@
 }
 
 #pragma mark - btn actions
+- (void)dismissVC
+{
+    if (_delegateFlag.dismiss) [self.delegate performSelector:@selector(onDismiss)];
+}
 
 - (void)retake
 {
@@ -331,11 +331,6 @@
 - (void)doneClick
 {
     if (_delegateFlag.okClick) [self.delegate performSelector:@selector(onOkClick)];
-}
-
-- (void) openGallery
-{
-    if (_delegateFlag.openGallery) [self.delegate performSelector:@selector(onOpenGallery)];
 }
 
 @end
@@ -366,8 +361,6 @@
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *previewLayer;
 //切换摄像头按钮
 @property (nonatomic, strong) UIButton *toggleCameraBtn;
-//取消按钮
-@property (nonatomic, strong) UIButton *dismissBtn;
 //聚焦图
 @property (nonatomic, strong) UIImageView *focusCursorImageView;
 //录制视频保存的url
@@ -395,7 +388,7 @@
     
     [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-//    NSLog(@"---- %s", __FUNCTION__);
+    //    NSLog(@"---- %s", __FUNCTION__);
 }
 
 - (void)viewDidLoad {
@@ -410,7 +403,7 @@
             if (self.allowRecordVideo) {
                 [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
                     if (!granted) {
-                        [self dismissBtnClick];
+                        [self onDismiss];
                     } else {
                         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive) name:UIApplicationWillResignActiveNotification object:nil];
                     }
@@ -419,7 +412,7 @@
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive) name:UIApplicationWillResignActiveNotification object:nil];
             }
         } else {
-            [self dismissBtnClick];
+            [self onDismiss];
         }
     }];
     
@@ -431,6 +424,7 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    [UIApplication sharedApplication].statusBarHidden = NO;
     [self.motionManager stopDeviceMotionUpdates];
     self.motionManager = nil;
 }
@@ -480,6 +474,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [UIApplication sharedApplication].statusBarHidden = YES;
     [self.session startRunning];
     [self setFocusCursorWithPoint:self.view.center];
     if (!self.allowTakePhoto && !self.allowRecordVideo) {
@@ -490,7 +485,6 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    [UIApplication sharedApplication].statusBarHidden = NO;
     if (self.session) {
         [self.session stopRunning];
     }
@@ -517,7 +511,6 @@
     self.toolView.frame = CGRectMake(0, kViewHeight-130-ZL_SafeAreaBottom, kViewWidth, 100);
     self.previewLayer.frame = self.view.layer.bounds;
     self.toggleCameraBtn.frame = CGRectMake(kViewWidth-50, 20, 30, 30);
-    self.dismissBtn.frame = CGRectMake(20, 20, 30, 30);
 }
 
 - (void)setupUI
@@ -543,11 +536,6 @@
     [self.toggleCameraBtn setImage:GetImageWithName(@"zl_toggle_camera") forState:UIControlStateNormal];
     [self.toggleCameraBtn addTarget:self action:@selector(btnToggleCameraAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.toggleCameraBtn];
-
-    self.dismissBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.dismissBtn setImage:GetImageWithName(@"zl_arrow_down") forState:UIControlStateNormal];
-    [self.dismissBtn addTarget:self action:@selector(dismissBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.dismissBtn];
     
     if (self.allowRecordVideo) {
         UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(adjustCameraFocus:)];
@@ -620,22 +608,13 @@
             
         case ZLCaptureSessionPreset1280x720:
             return AVCaptureSessionPreset1280x720;
-        
+            
         case ZLCaptureSessionPreset1920x1080:
             return AVCaptureSessionPreset1920x1080;
             
         case ZLCaptureSessionPreset3840x2160:
             return AVCaptureSessionPreset3840x2160;
     }
-}
-
-#pragma mark - 取消
-
-- (void)dismissBtnClick
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self dismissViewControllerAnimated:YES completion:nil];
-    });
 }
 
 #pragma mark - 点击屏幕设置聚焦点
@@ -857,89 +836,12 @@
     }];
 }
 
-//点开相册
-- (void)onOpenGallery
+//dismiss
+- (void)onDismiss
 {
-    [[self getPas] showPhotoLibrary];
-}
-
-- (ZLPhotoActionSheet *)getPas
-{
-    ZLPhotoActionSheet *actionSheet = [[ZLPhotoActionSheet alloc] init];
-    
-#pragma mark - 参数配置 optional，可直接使用 defaultPhotoConfiguration
-    
-    //以下参数为自定义参数，均可不设置，有默认值
-    actionSheet.configuration.sortAscending = YES;
-    actionSheet.configuration.allowSelectImage = YES;
-    actionSheet.configuration.allowSelectGif = YES;
-    actionSheet.configuration.allowSelectVideo = NO;
-    actionSheet.configuration.allowSelectLivePhoto = YES;
-    actionSheet.configuration.allowForceTouch = YES;
-    actionSheet.configuration.allowEditImage = YES;
-    actionSheet.configuration.allowEditVideo = NO;
-    actionSheet.configuration.allowSlideSelect = NO;
-    actionSheet.configuration.allowMixSelect = NO;
-    actionSheet.configuration.allowDragSelect = NO;
-    //设置相册内部显示拍照按钮
-    actionSheet.configuration.allowTakePhotoInLibrary = NO;
-    //设置在内部拍照按钮上实时显示相机俘获画面
-    actionSheet.configuration.showCaptureImageOnTakePhotoBtn = NO;
-    //设置照片最大预览数
-    actionSheet.configuration.maxPreviewCount = 0;
-    //设置照片最大选择数
-    actionSheet.configuration.maxSelectCount = 9;
-    //设置允许选择的视频最大时长
-    actionSheet.configuration.maxVideoDuration = 120;
-    //设置照片cell弧度
-    actionSheet.configuration.cellCornerRadio = 0;
-    //单选模式是否显示选择按钮
-    //    actionSheet.configuration.showSelectBtn = YES;
-    //是否在选择图片后直接进入编辑界面
-    actionSheet.configuration.editAfterSelectThumbnailImage = NO;
-    //是否保存编辑后的图片
-    //    actionSheet.configuration.saveNewImageAfterEdit = NO;
-    //设置编辑比例
-    //    actionSheet.configuration.clipRatios = @[GetClipRatio(7, 1)];
-    //是否在已选择照片上显示遮罩层
-    actionSheet.configuration.showSelectedMask = NO;
-    //颜色，状态栏样式
-    //    actionSheet.configuration.selectedMaskColor = [UIColor purpleColor];
-    //    actionSheet.configuration.navBarColor = [UIColor orangeColor];
-    //    actionSheet.configuration.navTitleColor = [UIColor blackColor];
-    //    actionSheet.configuration.bottomBtnsNormalTitleColor = kRGB(80, 160, 100);
-    //    actionSheet.configuration.bottomBtnsDisableBgColor = kRGB(190, 30, 90);
-    //    actionSheet.configuration.bottomViewBgColor = [UIColor blackColor];
-    //    actionSheet.configuration.statusBarStyle = UIStatusBarStyleDefault;
-    //是否允许框架解析图片
-    actionSheet.configuration.shouldAnialysisAsset = YES;
-    //框架语言
-//    actionSheet.configuration.languageType = self.languageSegment.selectedSegmentIndex;
-    //自定义多语言
-    //    actionSheet.configuration.customLanguageKeyValue = @{@"ZLPhotoBrowserCameraText": @"没错，我就是一个相机"};
-    //自定义图片
-    //    actionSheet.configuration.customImageNames = @[@"zl_navBack"];
-    
-    //是否使用系统相机
-    //    actionSheet.configuration.useSystemCamera = YES;
-    //    actionSheet.configuration.sessionPreset = ZLCaptureSessionPreset1920x1080;
-    //    actionSheet.configuration.exportVideoType = ZLExportVideoTypeMp4;
-    //    actionSheet.configuration.allowRecordVideo = NO;
-    //    actionSheet.configuration.maxVideoDuration = 5;
-#pragma mark - required
-    //如果调用的方法没有传sender，则该属性必须提前赋值
-    actionSheet.sender = self;
-    
-//    zl_weakify(self);
-//    [actionSheet setSelectImageBlock:^(NSArray<UIImage *> * _Nonnull images, NSArray<PHAsset *> * _Nonnull assets, BOOL isOriginal) {
-//        zl_strongify(weakSelf);
-//    }];
-//
-//    actionSheet.cancleBlock = ^{
-//        NSLog(@"取消选择图片");
-//    };
-//
-    return actionSheet;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self dismissViewControllerAnimated:YES completion:nil];
+    });
 }
 
 - (void)playVideo

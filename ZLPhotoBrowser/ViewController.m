@@ -178,6 +178,10 @@
         NSLog(@"取消选择图片");
     };
     
+    [actionSheet setDoneBlock:^(UIImage * _Nonnull image, NSURL * _Nonnull videoUrl) {
+        NSLog(@"哈哈哈哈哈哈哈");
+    }];
+    
     return actionSheet;
 }
 
