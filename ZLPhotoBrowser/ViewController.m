@@ -157,7 +157,7 @@
     //如果调用的方法没有传sender，则该属性必须提前赋值
     actionSheet.sender = self;
     //记录上次选择的图片
-    actionSheet.arrSelectedAssets = self.rememberLastSelSwitch.isOn&&self.maxSelCountTextField.text.integerValue>1 ? self.lastSelectAssets : nil;
+//    actionSheet.arrSelectedAssets = self.rememberLastSelSwitch.isOn&&self.maxSelCountTextField.text.integerValue>1 ? self.lastSelectAssets : nil;
     
     zl_weakify(self);
     [actionSheet setSelectImageBlock:^(NSArray<UIImage *> * _Nonnull images, NSArray<PHAsset *> * _Nonnull assets, BOOL isOriginal) {
@@ -179,7 +179,7 @@
     };
     
     [actionSheet setDoneBlock:^(UIImage * _Nonnull image, NSURL * _Nonnull videoUrl) {
-        NSLog(@"哈哈哈哈哈哈哈");
+        NSLog(@"%@======%@",image,videoUrl);
     }];
     
     return actionSheet;
