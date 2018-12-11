@@ -40,7 +40,6 @@ double const ScalePhotoWidth = 1000;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *verColHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *verBottomSpace;
 
-
 @property (nonatomic, assign) BOOL animate;
 @property (nonatomic, assign) BOOL preview;
 
@@ -530,6 +529,9 @@ double const ScalePhotoWidth = 1000;
     }
 }
 
+
+
+
 - (IBAction)btnPhotoLibrary_Click:(id)sender
 {
     if (![ZLPhotoManager havePhotoLibraryAuthority]) {
@@ -906,9 +908,6 @@ double const ScalePhotoWidth = 1000;
                 if (suc) {
                     ZLPhotoModel *model = [ZLPhotoModel modelWithAsset:asset type:ZLAssetMediaTypeImage duration:nil];
                     [strongSelf handleDataArray:model];
-                    if (weakSelf.doneBlock) {
-                        weakSelf.doneBlock(image, videoUrl);
-                    }
                 } else {
                     ShowToastLong(@"%@", GetLocalLanguageTextValue(ZLPhotoBrowserSaveImageErrorText));
                 }
@@ -923,9 +922,6 @@ double const ScalePhotoWidth = 1000;
                     ZLPhotoModel *model = [ZLPhotoModel modelWithAsset:asset type:ZLAssetMediaTypeVideo duration:nil];
                     model.duration = [ZLPhotoManager getDuration:asset];
                     [strongSelf handleDataArray:model];
-                    if (weakSelf.doneBlock) {
-                        weakSelf.doneBlock(image, videoUrl);
-                    }
                 } else {
                     ShowToastLong(@"%@", GetLocalLanguageTextValue(ZLPhotoBrowserSaveVideoFailed));
                 }

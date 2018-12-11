@@ -36,11 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^selectImageBlock)(NSArray<UIImage *> *__nullable images, NSArray<PHAsset *> *assets, BOOL isOriginal);
 
 /**
- 如果拍照则videoUrl为nil，如果视频则image为nil
- */
-@property (nonatomic, copy) void (^doneBlock)(UIImage *image, NSURL *videoUrl);
-
-/**
  取消选择回调
  */
 @property (nonatomic, copy) void (^cancleBlock)(void);
